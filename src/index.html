@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Cot Hypernet</title>
+        <script type="text/javascript">
+            const {
+                ipcRenderer,
+                app
+            } = require("electron");
+            let fcable = false;
+            window.onbeforeunload = function(e) {
+                if (!fcable) {
+                    ipcRenderer.send("closing");
+                    e.returnValue = false;
+                } else {
+                    docmd('taskkill /f /im gnirehtet.exe', undefined, () => {}, (err) => {
+                        console.error(err)
+                    }, () => {});
+                }
+            };
+            ipcRenderer.on("fclose", function(event, arg) {
+                fcable = true;
+                ipcRenderer.send("exitingss");
+            });
+
+            function exit() {
+                fcable = true;
+                window.close();
+            }
+
+            function reload() {
+                fcable = true;
+                location.reload();
+            }
+        </script>
+    </head>
+
+    <body>
+        <style type="text/css">
+            * {
+                transition: 0.3s;
+            }
+
+            body {
+                font-family: 'SEgoe';
+                background-color: #282923;
+                color: white;
+            }
+
+            @font-face {
+                font-family: 'SEgoe';
+                src: url('segoeuil.ttf');
+            }
+
+            .titlebar {
+                position: fixed;
+                top: 0px;
+                left: 0px;
+                right: 0px;
+                height: 30px;
+                -webkit-app-region: drag;
+                background-color: #282923;
+                color: white;
+                z-index: 50000;
+            }
+
+            .titlebar span {
+                color: white;
+                position: absolute;
+                top: 6px;
+                margin-left: 7px;
+                font-size: 14px;
+            }
+
+            .controlbtn {
+                width: 45px;
+                height: 29px;
+                position: absolute;
+                -webkit-app-region: none;
+                background-color: #282923;
+                -webkit-user-select: none;
+            }
+
+            #closebtn {
+                right: 1px;
+                top: 1px;
+            }
+
+            #closebtn:hover {
+                background-color: rgba(255, 50, 50, .5);
+            }
+
+            #closebtn:active {
+                background-color: rgba(255, 150, 150, .7);
+            }
+
+            .mpmaskbtnui {
+                top: 36px;
+                width: 435px;
+                height: 95px;
+                overflow: hidden;
+                display: block;
+                user-select: none;
+                position: absolute;
+            }
+
+            .openitem {
+                border: 1px solid #323328;
+                margin: 6px;
+                border-radius: 4px;
+                padding: 2px;
+                padding-left: 4px;
+                padding-right: 4px;
+                top: 14px;
+                text-align: left;
+                cursor: pointer;
+                width: ;
+            }
+
+            .openitem:hover {
+                background-color: #4d4d4d;
+            }
+
+            .openitem:active {
+                background-color: #777;
+            }
+
+            .openitem span {
+                position: absolute;
+                margin-top: 4px;
+                margin-left: 5px;
+            }
+
+            .openitem img {
+                margin-top: 4px;
+                margin-left: 5px;
+            }
+        </style>
+        <div class="titlebar">
+            <img src="../bin/icon.png" height="20" style="margin-top: 6px;margin-left: 8px;">
+            <span id="titletext">Cot Hypernet</span>
+            <img src="img/window/Close.svg" class="controlbtn" id="closebtn" onclick="window.close();">
+        </div>
+        <table class="mpmaskbtnui" id="mpmaskbtnui">
+            <tr>
+                <td class="openitem" rowspan="3" style="vertical-align: top;" width="140px">Status:<br><span id="statusft"
+                        style="font-size: 30px;width: 130px;text-align: center;color: yellow">Loading</span></td>
+                <td class="openitem" colspan="2" rowspan="2" style="vertical-align: top;" width="200px">Data transfer:<br><span
+                        id='dtit'>Nothing caught</span></td>
+                <td class="openitem" width="65px" onclick="pause()">Pause</td>
+            </tr>
+            <tr>
+                <td class="openitem" width="65px" onclick="continues()">Continue</td>
+            </tr>
+            <tr>
+                <td class="openitem" onclick="help()">Help</td>
+                <td class="openitem" onclick="reload()">Reload</td>
+                <td class="openitem" onclick="exit()">Exit</td>
+            </tr>
+        </table>
+        <script>
+            if(window.localStorage.getItem('hidewin')){
+                    ipcRenderer.send("closing");
+            }else{
+                alert('Welcome to Cot Hypernet for the first time! We will show an icon on the taskbar instead of poping the control panel up next time.');
+            }
+            window.localStorage.setItem('hidewin',true);
+            const exec = require('child_process').exec;
+            let dtit = document.getElementById("dtit");
+            let statusft = document.getElementById('statusft');
+            //buttons
+            function help() {
+                alert(
+                    "Turn on USB Debugging on your phone and then insert your phone to the computer. After connected, if you're using this for the first time, there will be a notification on your phone that asks to install [Cot Hypernet]. Please accept. Then, allow creating VPN connection. After these steps, you can surf online easily."
+                );
+            }
+            let workerProcess;
+
+            function docmd(cmdStr, cmdPath, print, error, exits) {
+                workerProcess = exec(cmdStr, {
+                    cwd: cmdPath
+                })
+                workerProcess.stdout.on('data', function(data) {
+                    print(data)
+                });
+                workerProcess.stderr.on('data', function(data) {
+                    error(data)
+                });
+                workerProcess.on('close', function(code) {
+                    exits(code);
+                })
+            }
+
+            setTimeout(function() {
+                statusft.innerText = 'Listening';
+                statusft.style.color = '#00e66f';
+                docmd('gnirehtet autorun -d 114.114.114.114,114.114.115.115', 'bin', (dtas) => {
+                    console.log(dtas);
+                    if (dtas.search(
+                            /(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d):*(\d*\d*\d*\d*\d*)/
+                        )) {
+                        let rd2035 = dtas.match(
+                            /(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d):*(\d*\d*\d*\d*\d*)/g
+                        );
+                        if (rd2035 != null) {
+                            dtit.innerText = rd2035[1];
+                        }
+                    }
+                }, (dtas) => {
+                    if (dtas.indexOf('Execution error: IO error') > -1) {
+                        docmd('taskkill /f /im gnirehtet.exe', undefined, () => {}, (err) => {
+                            console.error(err)
+                        }, () => {});
+                    }
+                    console.warn(dtas);
+                }, (code) => {
+                    console.error(code);
+                });
+            }, 1000);
+
+            let paused = false;
+
+            function pause() {
+                if (pause == true) return;
+                docmd('taskkill /f /im gnirehtet.exe', undefined, () => {}, (err) => {
+                    console.error(err)
+                }, () => {});
+                statusft.innerText = 'Stopped';
+                statusft.style.color = 'red';
+                paused = true;
+            }
+
+            function continues () {
+                if (pause == false) return;
+                statusft.innerText = 'Listening';
+                statusft.style.color = '#00e66f';
+                docmd('gnirehtet autorun -d 114.114.114.114,114.114.115.115', 'bin', (dtas) => {
+                    console.log(dtas);
+                    if (dtas.search(
+                            /(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d):*(\d*\d*\d*\d*\d*)/
+                        )) {
+                        let rd2035 = dtas.match(
+                            /(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d):*(\d*\d*\d*\d*\d*)/g
+                        );
+                        if (rd2035 != null) {
+                            dtit.innerText = rd2035[1];
+                        }
+                    }
+                }, (dtas) => {
+                    if (dtas.indexOf('Execution error: IO error') > -1) {
+                        docmd('taskkill /f /im gnirehtet.exe', undefined, () => {}, (err) => {
+                            console.error(err)
+                        }, () => {});
+                    }
+                    console.warn(dtas);
+                }, (code) => {
+                    console.error(code);
+                });
+            }
+        </script>
+    </body>
+
+</html>
