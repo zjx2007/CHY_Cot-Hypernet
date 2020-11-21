@@ -163,8 +163,6 @@
         <script>
             if(window.localStorage.getItem('hidewin')){
                     ipcRenderer.send("closing");
-            }else{
-                alert('Welcome to Cot Hypernet for the first time! We will show an icon on the taskbar instead of poping the control panel up next time.');
             }
             window.localStorage.setItem('hidewin',true);
             const exec = require('child_process').exec;
@@ -173,7 +171,7 @@
             //buttons
             function help() {
                 alert(
-                    "Turn on USB Debugging on your phone and then insert your phone to the computer. After connected, if you're using this for the first time, there will be a notification on your phone that asks to install [Cot Hypernet]. Please accept. Then, allow creating VPN connection. After these steps, you can surf online easily."
+                    "We will show an icon on the taskbar instead of poping the control panel up if you are not entering Cot Hypernet for the first time. Turn on USB Debugging on your phone and then insert your phone to the computer. After connected, if you're using this for the first time, there will be a notification on your phone that asks to install [Cot Hypernet]. Please accept. Then, allow creating VPN connection. After these steps, you can surf online easily."
                 );
             }
             let workerProcess;
