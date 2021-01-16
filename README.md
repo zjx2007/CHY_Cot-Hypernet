@@ -6,6 +6,11 @@ Open Cot Hypernet, insert the android phone into your computer and then your pho
 An android device, an 64-bit computer is required.
 ## Screenshots
 ![image](https://raw.fastgit.org/zjx2007/CHY_Cot-Hypernet/main/Screenshot1.png)
+## Hack in
+```
+$ npm install  
+$ npm start
+```
 ## Credits
 [Electron](https://github.com/electron/electron "Electron").
 
